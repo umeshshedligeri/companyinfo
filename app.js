@@ -9,13 +9,14 @@ const passport = require("passport");
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var company = require('./routes/company');
+var listIds = require('./routes/listIds');
 const keys = require("./config/keys");
 
 var app = express();
 
 //DB Connection
 mongoose
-  .connect(keys.mongoURI, { useNewUrlParser: true,useUnifiedTopology: true })
+  .connect(keys.mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("Connected to Mongoose"))
   .catch(err => console.log(err));
 
@@ -28,6 +29,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static('public/files'));
 //Passport middleware
 app.use(passport.initialize());
 
@@ -36,12 +38,13 @@ require("./config/passport")(passport);
 
 app.use('/', indexRouter);
 app.use('/api/users', usersRouter);
-app.use('/api/company',company)
+app.use('/api/company', company);
+app.use('/api/list', listIds);
 
 
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
 
@@ -59,7 +62,7 @@ if (app.get("env") === "development") {
 
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
